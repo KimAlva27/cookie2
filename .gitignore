@@ -1,0 +1,11 @@
+*.pem
+.envrc
+.direnv/
+*.tgz
+*.tar.gz
+*.crt
+*.back
+__pycache__/
+backups/
+*json-files*
+*.todelete

@@ -1,0 +1,10 @@
+apiVersion: v2
+name: global-demo-praas-auto
+type: application
+appVersion: 0.0.1
+version: 0.0.1
+
+dependencies:
+  - name: ai-models-chart
+    version: 0.0.2
+    repository: https://artifactory-gdt.central-03.nextgen.igrupobbva/artifactory/gl-seiri-helm-local/
