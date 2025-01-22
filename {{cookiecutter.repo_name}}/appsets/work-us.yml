@@ -1,0 +1,41 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: ie-global-demo-work-us-appset
+  namespace: argocd
+spec:
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+  - git:
+      repoURL: ssh://git@globaldevtools.central-03.nextgen.igrupobbva:7999/intelligentextract/eks-global-models-module.git
+      revision: master
+      files:
+      - path: apps/*/envs/work-us/*.yaml
+  template:
+    metadata:
+      name: 'demo-{{index .path.segments 1}}-{{ trimSuffix ".yaml" .path.filename }}-{{index .path.segments 3}}'
+    spec:
+      project: ie-global-models
+      source:
+        repoURL: ssh://git@globaldevtools.central-03.nextgen.igrupobbva:7999/intelligentextract/eks-global-models-module.git
+        targetRevision: master
+        path: '{{index .path.segments 0}}/{{index .path.segments 1}}'
+        plugin:
+          name: argocd-vault-plugin-helm
+          env:
+            - name: HELM_ARGS
+              value: -f envs/work-us/{{ .path.filename }} -f base/{{ .path.filename}}
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: ie-global-demo
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=false
+          - ApplyOutOfSyncOnly=true
+        automated:
+          selfHeal: true
+      ignoreDifferences:
+        - group: apps
+          kind: Deployment
+          jsonPointers:
+            - /spec/replicas
